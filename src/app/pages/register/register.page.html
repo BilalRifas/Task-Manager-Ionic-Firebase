@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-button expand="full" color="primary" (click)="goToHomePage()"><ion-title>Task Manager</ion-title></ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="auth-container">
+  <div class="background-overlay"></div>
+
+  <ion-card class="login-card">
+    <ion-card-header>
+      <ion-card-title class="title">Create Account</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form (ngSubmit)="register()">
+        <ion-item>
+          <ion-label position="floating">Email</ion-label>
+          <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Password</ion-label>
+          <ion-input [(ngModel)]="password" name="password" type="password" required></ion-input>
+        </ion-item>
+
+        <ion-button expand="full" type="submit" color="primary" class="register-button">
+          Register
+        </ion-button>
+
+        <ion-button expand="full" fill="outline" color="secondary" (click)="goToLogin()">
+          Already have an account? Login
+        </ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
