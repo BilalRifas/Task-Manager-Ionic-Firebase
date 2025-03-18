@@ -1,0 +1,114 @@
+<ion-header translucent="true">
+    <ion-toolbar color="primary">
+      <ion-title>📌 Task Manager</ion-title>
+      
+      <ion-buttons slot="end">
+        <ion-text class="logged-in-user">
+          Welcome, {{ currentUser?.email }}
+        </ion-text>
+        <ion-button fill="solid" color="light" (click)="logout()">Logout</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content class="ion-padding">
+    <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+      <ion-refresher-content pullingText="⬇ Pull to refresh" refreshingSpinner="bubbles"></ion-refresher-content>
+    </ion-refresher>
+  
+    <ion-card class="task-card">
+      <ion-card-header>
+        <ion-card-title class="text-center">📝 Add New Task</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+
+        <ion-item>
+          <ion-input [(ngModel)]="newTaskTitle" placeholder="Task Title" class="input-box"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-textarea [(ngModel)]="newTaskDescription" placeholder="Task Description"></ion-textarea>
+        </ion-item>
+  
+        <ion-item lines="none">
+          <ion-label>Set Due Date</ion-label>
+          <ion-toggle [(ngModel)]="enableDueDate" (ionChange)="toggleDueDate()"></ion-toggle>
+        </ion-item>
+  
+        <ion-item *ngIf="enableDueDate">
+          <ion-label position="floating">📅 Due Date</ion-label>
+          <ion-datetime [(ngModel)]="newTaskDueDate" display-format="DD MMM YYYY"></ion-datetime>
+        </ion-item>
+  
+        <ion-item lines="none">
+          <ion-label>📎 Upload File</ion-label>
+          <ion-button fill="outline" (click)="fileInput.click()">Choose File</ion-button>
+          <span *ngIf="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+        </ion-item>
+        <input type="file" hidden #fileInput (change)="onFileSelected($event)" />
+  
+        <ion-button expand="block" color="success" (click)="addTask()">➕ Add Task</ion-button>
+      </ion-card-content>
+    </ion-card>
+  
+    <div class="spinner-container" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  
+    <ion-list *ngIf="!loading">
+      <ion-item *ngFor="let task of tasks" class="task-item">
+        <ion-label *ngIf="editingTaskId !== task.id">
+          <h2 class="task-title">{{ task.title }}</h2>
+          <p class="task-desc">{{ task.description }}</p>
+          <p *ngIf="task.dueDate" class="task-date">📅 <strong>Due Date:</strong> {{ task.dueDate | date: 'mediumDate' }}</p>
+          <ion-chip [color]="task.status === 'completed' ? 'success' : 'warning'">
+            {{ task.status }}
+          </ion-chip>
+          
+          <div *ngIf="task.fileUrl">
+            <ion-label>📂 Uploaded File:</ion-label>
+            <a [href]="task.fileUrl" target="_blank">
+              <ion-button fill="clear">View File</ion-button>
+            </a>
+          </div>
+        </ion-label>
+  
+        <div *ngIf="editingTaskId === task.id">
+          <ion-item>
+            <ion-input [(ngModel)]="editTitle" placeholder="Task Title"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-textarea [(ngModel)]="editDescription" placeholder="Task Description"></ion-textarea>
+          </ion-item>
+  
+          <ion-item lines="none">
+            <ion-label>Set Due Date</ion-label>
+            <ion-toggle [(ngModel)]="editEnableDueDate" (ionChange)="toggleEditDueDate()"></ion-toggle>
+          </ion-item>
+  
+          <ion-item *ngIf="editEnableDueDate">
+            <ion-label position="floating">📅 Due Date</ion-label>
+            <ion-datetime [(ngModel)]="editDueDate" display-format="DD MMM YYYY"></ion-datetime>
+          </ion-item>
+
+        <ion-item lines="none">
+            <ion-label>📎 Upload New File</ion-label>
+            <ion-button fill="outline" (click)="editFileInput.click()">Choose File</ion-button>
+            <span *ngIf="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+        </ion-item>
+        <input type="file" hidden #editFileInput (change)="onEditFileSelected($event)" /> 
+          <ion-button expand="full" color="success" (click)="saveTask(task.id!)">💾 Save</ion-button>
+          <ion-button expand="full" color="medium" (click)="cancelEdit()">❌ Cancel</ion-button>
+        </div>
+  
+        <div *ngIf="editingTaskId !== task.id" class="task-actions">
+          <ion-button fill="solid" color="tertiary" *ngIf="task.status !== 'completed'" (click)="markAsCompleted(task)">
+            ✅ Complete
+          </ion-button>
+          <ion-button fill="solid" color="danger" (click)="deleteTask(task.id!)">🗑 Delete</ion-button>
+          <ion-button fill="solid" color="warning" (click)="editTask(task)">✏ Edit</ion-button>
+        </div>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+  
